@@ -18,7 +18,7 @@ const menuItemSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Please add a category'],
-    enum: ['Appetizers', 'Main Course', 'Desserts', 'Drinks', 'Specials']
+    // enum: ['Appetizers', 'Main Course', 'Desserts', 'Drinks', 'Specials']
   },
   image: {
     type: String,
@@ -30,11 +30,11 @@ const menuItemSchema = new mongoose.Schema({
   },
   dietaryInfo: [{
     type: String,
-    enum: ['Vegetarian', 'Vegan', 'Gluten-Free', 'Seafood', 'Non-Vegetarian']
+    // enum: ['Vegetarian', 'Vegan', 'Gluten-Free', 'Seafood', 'Non-Vegetarian']
   }],
   spiceLevel: {
     type: String,
-    enum: ['Mild', 'Medium', 'Hot']
+    // enum: ['Mild', 'Medium', 'Hot']
   },
   ingredients: [{
     type: String

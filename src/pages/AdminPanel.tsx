@@ -1,6 +1,12 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
 import axios from 'axios';
+// import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+// import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 interface Registration {
   _id: string;
@@ -10,6 +16,7 @@ interface Registration {
   registrationDate: string;
 }
 
+// import {AddNewMenuItemModal} from "../components/ui/AddNewMenuItemModal"
 
 const MOCK_ORDERS = [
   {
@@ -36,7 +43,7 @@ export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<'registrations' | 'orders' | 'menu'>('registrations');
 
   const [applications, setApplications] = useState<Registration[]>([]);
-
+  const [menus, setMenus] = useState([]);
   const approveUser = async (userId: any) => {
     try {
       const res = await axios.post("http://localhost:5000/api/users/approve-user", {
@@ -208,17 +215,179 @@ export function AdminPanel() {
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold">Menu Items</h2>
-                <Button>Add New Item</Button>
+                {/* <Button>Add New Item</Button> */}
+                <AddNewMenuItemModal menus={menus} setMenus={setMenus} />
               </div>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-center text-gray-600">
-                  Menu management interface will be implemented here
-                </p>
-              </div>
+
+              {
+                menus?.length === 0 && (
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-center text-gray-600">
+                      Menu management interface will be implemented here
+                    </p>
+                  </div>
+                )
+              }
+
+              {
+                menus?.length > 0 && (
+                  <div className='flex flex-col items-center gap-x-2 gap-y-2'>
+                    {
+                      menus?.map((item: any, i) => (
+                        <div key={i} className='w-full grid grid-cols-4 gap-x-3 bg-gray-500/10 px-10 py-2'>
+                          <p className='text-lg font-semibold'>Name: {item?.name}</p>
+                          <p>Category: {item?.category}</p>
+                          <p>BDT{item?.price}</p>
+                          <p>Availability: {item?.available ? "In Stock" : "Out of Stock"}</p>
+                        </div>
+                      ))
+                    }
+                  </div>
+                )
+              }
             </div>
           )}
         </div>
       </div>
     </div>
   );
+}
+
+
+export const AddNewMenuItemModal = ({ menus, setMenus }) => {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState<String>("");
+  const [description, setDescription] = useState<String>("");
+  const [category, setCategory] = useState<String>("");
+  const [image, setImage] = useState<String>("");
+  const [dietaryInfo, setDietaryInfo] = useState<String>("");
+  const [spiceLevel, setSpiceLevel] = useState<String>("");
+  const [ingredients, setIngredients] = useState<String>("");
+  const [price, setPrice] = useState<Number>(0);
+  const [popularity, setPopularity] = useState<Number>(0);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    // setOpen(false);
+    console.log({
+      name, description, price, popularity, category, image, dietaryInfo, spiceLevel, ingredients, available: true
+    })
+
+    try {
+      const res = await axios.post("/api/menu/create-new-menu", {
+        name, description, price, popularity, category, image, dietaryInfo, spiceLevel, ingredients, available: true
+      })
+
+      const data = res?.data;
+
+      if (data?.success) {
+        setMenus([data?.data, ...menus])
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  return (
+    <div>
+      <React.Fragment>
+        <button onClick={handleClickOpen} className='bg-[#4F46E7] text-white rounded-lg px-6 py-2'>
+          Open alert dialog
+        </button>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Add New Menu Item"}
+          </DialogTitle>
+          <DialogContent>
+            {/* <DialogContentText id="alert-dialog-description">
+              Let Google help apps determine location. This means sending anonymous
+              location data to Google, even when no apps are running.
+            </DialogContentText> */}
+
+            <form onSubmit={handleSubmit} className='w-[400px] lg:w-[500px] min-h-[250px]'>
+              <div className='w-full flex flex-col gap-y-3'>
+                <input
+                  type='text'
+                  placeholder='Item Name' className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setName(e.target.value)}
+                />
+                <input
+                  type='text'
+                  placeholder='Item Description'
+                  className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setDescription(e.target.value)}
+                />
+                <input
+                  type='text'
+                  placeholder='Item Category'
+                  className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setCategory(e.target.value)}
+                />
+                <input
+                  type='text'
+                  placeholder='Item Image'
+                  className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setImage(e.target.value)}
+                />
+                <input
+                  type='text'
+                  placeholder='Item Dietery Info'
+                  className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setDietaryInfo(e.target.value)}
+                />
+                <input
+                  type='text'
+                  placeholder='Item Spice Level'
+                  className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setSpiceLevel(e.target.value)}
+                />
+                <input
+                  type='text'
+                  placeholder='Item Ingredients'
+                  className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setIngredients(e.target.value)}
+                />
+                <input
+                  type='number'
+                  placeholder='Item Price in BDT'
+                  className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setPrice(Number(e.target.value))}
+                />
+                <input
+                  type='number'
+                  placeholder='Item Popularity'
+                  className='w-full py-2 px-2 rounded-md focus:outline focus:outline-[#4F46E7]  border-2 focus:border-[#4F46E7] border-neutral-500'
+                  onChange={e => setPopularity(Number(e.target.value))}
+                />
+              </div>
+              <div className='w-full flex items-center justify-end mt-2'>
+                <button type='submit' className='bg-[#4F46E7] px-4 py-2 text-white rounded-md w-full'>Submit</button>
+              </div>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            {/* <Button onClick={handleClose}>Disagree</Button>
+            <Button onClick={handleClose} autoFocus>
+              Agree
+            </Button> */}
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
+    </div>
+  )
 }

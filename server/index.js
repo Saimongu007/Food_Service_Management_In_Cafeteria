@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.js"
 import userRoutes from "./routes/user.js"
 import { createServer } from 'http';
 import { User } from './models/User.js';
+import MenuItem from './models/MenuItem.js';
 import cors from "cors"
 dotenv.config();
 
@@ -55,6 +56,31 @@ app.post('/api/auth/register', async (req, res) => {
     })
   }
 });
+
+app.post('/api/menu/create-new-menu', async (req, res) => {
+  try {
+    const { name, description, price, popularity, category, image, dietaryInfo, spiceLevel, ingredients, available } = req.body;
+    const newItem = await MenuItem.create(req.body);
+
+    const data = newItem.toObject();
+
+    console.log(req.body);
+
+    return res.status(200).json({
+      success: true,
+      message: "Item added successfully",
+      data: data
+    })
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    })
+  }
+})
+
 // app.use('/api/posts', postsRoutes);
 app.use('/api/users', userRoutes);
 // app.use(

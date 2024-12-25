@@ -41,7 +41,6 @@ export const MENU_ITEMS: MenuItem[] = [
     ingredients: ['Chickpeas', 'Eggplant', 'Tahini', 'Fresh Herbs'],
     popularity: 4.7,
   },
-
   // Main Courses
   {
     id: 'main-1',
