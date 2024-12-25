@@ -302,7 +302,7 @@ export const AddNewMenuItemModal = ({ menus, setMenus }) => {
     <div>
       <React.Fragment>
         <button onClick={handleClickOpen} className='bg-[#4F46E7] text-white rounded-lg px-6 py-2'>
-          Open alert dialog
+          Add New Item
         </button>
         <Dialog
           open={open}
